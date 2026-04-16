@@ -3,6 +3,7 @@ let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
+const axios = require('axios');
 
 
 public_users.post("/register", (req,res) => {
@@ -77,5 +78,50 @@ public_users.get('/review/:isbn',function (req, res) {
         return res.status(208).json({ message: "Unable to find book" });
     return res.status(200).json(JSON.stringify(book.reviews, null, 4));
 });
+
+/**
+ * Asynchronous section
+ */
+public_users.get('/async', async function (req, res) {
+    try {
+        const response = await axios.get('http://localhost:5000/');
+        return res.status(200).json(response.data);
+    } catch (error) {
+        return res.status(500).json({ message: "Error fetching books" });
+    }
+});
+
+public_users.get('/async/isbn/:isbn', async function (req, res) {
+    try {
+        const { isbn } = req.params;
+        const response = await axios.get(`http://localhost:5000/isbn/${isbn}`);
+        return res.status(200).json(response.data);
+    } catch (error) {
+        return res.status(404).json({ message: "Unable to find book" });
+    }
+});
+
+public_users.get('/async/author/:author', async function (req, res) {
+    try {
+        const { author } = req.params;
+        const response = await axios.get(`http://localhost:5000/author/${author}`);
+        return res.status(200).json(response.data);
+    } catch (error) {
+        return res.status(404).json({ message: "Unable to find book" });
+    }
+});
+
+public_users.get('/async/title/:title', async function (req, res) {
+    try {
+        const { title } = req.params;
+        const response = await axios.get(`http://localhost:5000/title/${title}`);
+        return res.status(200).json(response.data);
+    } catch (error) {
+        return res.status(404).json({ message: "Unable to find book" });
+    }
+});
+/**
+ * Asynchronous section
+ */
 
 module.exports.general = public_users;
